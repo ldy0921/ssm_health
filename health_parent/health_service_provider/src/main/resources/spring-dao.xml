@@ -28,11 +28,25 @@
         <property name="password" value="${jdbc.password}"></property>
     </bean>
 
+    <!--使用xml配置分页助手-->
+    <bean id="pageHelper" class="com.github.pagehelper.PageHelper">
+        <property name="properties">
+            <props>
+                <prop key="dialect">mysql</prop>
+            </props>
+        </property>
+    </bean>
+
     <!--spring和mybatis整合, 替换映射文件-->
     <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="druid"></property>
         <!--加载核心文件-->
-        <property name="configLocation" value="classpath:SqlMapperConfig.xml"></property>
+        <!--<property name="configLocation" value="classpath:SqlMapperConfig.xml"></property>-->
+        <property name="plugins">
+            <array>
+                <ref bean="pageHelper"></ref>
+            </array>
+        </property>
     </bean>
 
     <!--批量扫描接口生成代理对象-->
@@ -45,9 +59,7 @@
         <property name="dataSource" ref="druid"></property>
     </bean>
 
-    <tx:annotation-driven transaction-manager="transactionManager2" proxy-target-class="true">
-
-    </tx:annotation-driven>
+    <tx:annotation-driven transaction-manager="transactionManager2" proxy-target-class="true"></tx:annotation-driven>
 
 
 </beans>

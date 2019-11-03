@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/vuejs-2.5.16.js"></script>
+    <script src="js/axios-0.18.0.js"></script>
+</head>
+<body>
+    <div id="app">
+        <form action="#" @submit.prevent >
+            <input type="text" v-model="username" ><br>
+            <input type="text" name="pwd" v-model="pwd"><br>
+            <button @click="fun1">button</button>
+        </form>
+        <h1>{{msg}}</h1>
+    </div>
+    </body>
+    </html>
+    <script>
+        //ajax
+
+        new Vue({
+            el: "#app",
+            data: {
+                username: "",
+                pwd: "",
+                msg: ""
+            },
+            methods: {
+                fun1: function () {
+                    var _this = this;
+                    axios.get("user/hello.do",{
+                        params: {
+                            username: _this.username,
+                            pwd: _this.pwd
+                        }
+                    }).then(function (resp) {
+                        _this.msg = resp.data.success
+                    }).catch(function (error) {
+
+                    });
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

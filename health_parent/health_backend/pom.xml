@@ -11,15 +11,6 @@
 
     <artifactId>health_backend</artifactId>
     <packaging>war</packaging>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.jxufe</groupId>
-            <artifactId>health_interface</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -33,6 +24,16 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- <dependencies>
+         <dependency>
+             <groupId>com.jxufe</groupId>
+             <artifactId>health_interface</artifactId>
+             <version>1.0-SNAPSHOT</version>
+         </dependency>
+     </dependencies>-->
+
+    
 
 
 </project>
