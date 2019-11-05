@@ -232,6 +232,32 @@
                 },
                 //添加
                 handleAdd () {
+                    //校验表单项是否合法
+                    this.$refs['dataAddForm'].validate((valid) => {
+                        if (valid) {
+                            //验证成功,发送ajax请求,将表单数据提交到后台
+                            //隐藏新增窗口
+                            this.dialogFormVisible = false;
+                            axios.post("/checkitem/add.do", this.formData).then(resp => {
+                                // 隐藏新增窗口
+                                if (resp.data.flag) {
+                                    // 响应成功
+                                    this.$message({
+                                        message: resp.data.message,
+                                        type: "success"
+                                    })
+                                } else {
+                                    // 响应失败
+                                    this.$message.error(resp.data.message)
+                                }
+                            }).finally(() => {
+                                this.findPage();
+                            });
+                        } else {
+                            //验证失败
+                            this.$message.error("表单数据校验失败!")
+                        }
+                    });
                 },
                 //分页查询
                 findPage() {
@@ -241,6 +267,7 @@
                 },
                 // 弹出添加窗口
                 handleCreate() {
+                    this.dialogFormVisible = true;
                 },
                 // 弹出编辑窗口
                 handleUpdate(row) {

@@ -40,7 +40,7 @@
     <dubbo:registry address="zookeeper://127.0.0.1:2181"></dubbo:registry>
 
     <!--批量扫描,发布服务-->
-    <dubbo:annotation package="com.jxufe.service.impl"></dubbo:annotation>
+    <dubbo:annotation package="com.jxufe.controller"></dubbo:annotation>
 
     <!---->
     <dubbo:consumer timeout="600000" check="false" ></dubbo:consumer>
