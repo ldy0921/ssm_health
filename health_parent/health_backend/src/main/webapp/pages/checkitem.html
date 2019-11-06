@@ -225,10 +225,37 @@
             },
             //钩子函数，VUE对象初始化完成后自动执行
             created() {
+                this.findPage();
             },
             methods: {
                 //编辑
                 handleEdit() {
+                    // 表单验证
+                    this.$refs['dataEditForm'].validate((valid) => {
+                       if (valid) {
+                           //校验成功,发送异步请求
+                           axios.post("/checkitem/edit.do", this.formData).then((resp) => {
+                               var result = resp.data;
+                               if (result.flag) {
+                                   // 请求成功
+                                   this.$message({
+                                       message: result.message,
+                                       type: "success"
+                                   });
+                               } else {
+                                   // 请求失败
+                                   this.$message.error(result.message);
+                               }
+                           }).finally(()=>{
+                               this.dialogFormVisible4Edit = false;
+                              this.findPage();
+                           });
+                       } else {
+                           //校验失败
+                           this.$message.error("表单校验失败!");
+                       }
+                    });
+
                 },
                 //添加
                 handleAdd () {
@@ -261,6 +288,18 @@
                 },
                 //分页查询
                 findPage() {
+                    //发送异步请求
+                    //组合分页参数
+                    var param = {
+                        currentPage: this.pagination.currentPage,
+                        pageSize: this.pagination.pageSize,
+                        queryString: this.pagination.queryString
+                    };
+                    axios.post('/checkitem/queryPage.do', param).then((resp) => {
+                        //为模型数据赋值,基于VUE的双向数据绑定展示到页面
+                        this.pagination.total = resp.data.total;
+                        this.dataList = resp.data.rows;
+                    });
                 },
                 // 重置表单
                 resetForm() {
@@ -271,12 +310,30 @@
                 },
                 // 弹出编辑窗口
                 handleUpdate(row) {
+                    this.dialogFormVisible4Edit = true;
+                    //发送异步请求,回显数据
+                    axios.get("/checkitem/findById.do?id=" + row.id).then((resp) => {
+                        if (resp.data.flag) {
+                            // 查找成功,
+                            this.formData = resp.data.data;
+                            console.log(resp.data.data);
+                        } else {
+                            // 查找失败
+                            this.$message.error(resp.data.message);
+                        }
+                    })
                 },
                 //切换页码
                 handleCurrentChange(currentPage) {
+                    this.pagination.currentPage = currentPage;
+                    this.findPage();
                 },
                 // 删除
                 handleDelete(row) {
+                    this.$confirm("你确定要删除当前选中的记录吗?","提示",{type:'warning'}).then(()=>{
+                        alert(用户点击了确定按钮)
+
+                    });
                 }
             }
         })
