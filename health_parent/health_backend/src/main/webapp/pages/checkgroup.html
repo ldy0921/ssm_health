@@ -173,13 +173,14 @@
                     <!-- 编辑标签弹层 -->
                     <div class="add-form">
                         <el-dialog title="编辑检查组" :visible.sync="dialogFormVisible4Edit">
-                            <template>
+                            <template slot-scope="scope">
                                 <el-tabs v-model="activeName" type="card">
                                     <el-tab-pane label="基本信息" name="first">
                                         <el-form label-position="right" label-width="100px">
                                             <el-row>
                                                 <el-col :span="12">
                                                     <el-form-item label="编码">
+                                                        <el-input v-model="formData.id" type="hidden"></el-input>
                                                         <el-input v-model="formData.code"/>
                                                     </el-form-item>
                                                 </el-col>
@@ -274,7 +275,8 @@
                 tableData:[],//新增和编辑表单中对应的检查项列表数据
                 checkitemIds:[],//新增和编辑表单中检查项对应的复选框，基于双向绑定可以进行回显和数据提交
                 dialogFormVisible: false,//控制添加窗口显示/隐藏
-                dialogFormVisible4Edit:false//控制编辑窗口显示/隐藏
+                dialogFormVisible4Edit:false,//控制编辑窗口显示/隐藏
+                obj: []
             },
             created() {
                 this.findPage();
@@ -282,27 +284,131 @@
             methods: {
                 //编辑
                 handleEdit() {
+
+                    //发送异步请求, 修改检查组的数据
+                    axios.post("/checkgroup/edit.do?checkitemIds="+this.checkitemIds, this.formData).then((resp => {
+                        if (resp.data.flag) {
+                            this.$message({
+                                message: resp.data.message,
+                                type: "success"
+                            });
+                        } else {
+                            //修改失败
+                            this.$message.error(resp.data.message);
+                        }
+                    })).finally(()=>{
+                        this.dialogFormVisible4Edit = false;
+                        this.findPage();
+                    });
                 },
                 //添加
                 handleAdd () {
+                    /*this.obj[0] = this.checkitemIds;
+                    this.obj[1] = this.formData;*/
+
+                    //发送异步请求,提交表单数据
+                    axios.post("/checkgroup/add.do?checkitemIds="+this.checkitemIds, this.formData).then(resp => {
+                        if (resp.data.flag) {
+                            // 操作成功
+                            $.messages({
+                                message: resp.data.data,
+                                type: "success"
+                            });
+                        } else {
+                            // 操作失败
+                            $.messages.error(resp.data.message)
+                        }
+                    }).finally(() => {
+                        // 分页查询
+                        this.dialogFormVisible = false;
+                        this.findPage();
+                    })
+
                 },
                 //分页查询
                 findPage() {
+                    // 封装分页参数
+                    var param = {
+                        currentPage: this.pagination.currentPage,
+                        pageSize: this.pagination.pageSize,
+                        queryString: this.pagination.queryString
+                    }
+                    //发送异步请求,获取分页数据
+                    axios.post("/checkgroup/findPage.do", param).then((resp) => {
+                        this.pagination.total = resp.data.total;
+                        this.dataList = resp.data.rows;
+                    })
                 },
                 // 重置表单
                 resetForm() {
+                    this.formData = {};
+                    this.checkitemIds = [];
                 },
                 // 弹出添加窗口
                 handleCreate() {
+                    this.resetForm();
+                    this.activeName = 'first';
+                    this.dialogFormVisible = true;
+
+                    // 发送异步请求,获取检查项的结合数据,转为json格式,赋值给vue模型数据tableData
+                    axios.get("/checkitem/findAll.do").then(resp => {
+                        this.tableData = resp.data;
+                    });
                 },
                 // 弹出编辑窗口
                 handleUpdate(row) {
+                    this.dialogFormVisible4Edit = true;
+                    // 发送异步请求, 获取回显数据,检查组信息回显
+                    axios.get("/checkgroup/findById.do?id="+row.id).then((resp) => {
+                        // console.log(resp.data)
+                        if (resp.data) {
+                            this.formData = resp.data;
+                            this.activeName = 'first';
+                            for (let i = 0; i < resp.data.checkItems.length; i++) {
+                                this.obj[i] = resp.data.checkItems[i].id
+                            }
+                        }
+
+                    });
+
+                    //检查项数据回显
+                    axios.get("/checkitem/findAll.do").then(resp => {
+                        this.tableData = resp.data;
+                        this.checkitemIds = this.obj;
+                    });
                 },
                 //切换页码
                 handleCurrentChange(currentPage) {
+                    this.pagination.currentPage = currentPage;
+                    this.findPage();
                 },
                 // 删除
                 handleDelete(row) {
+                    this.$confirm(
+                        "你确定要删除当前选中的记录吗?",
+                        "提示",
+                        {
+                            type: "warning"
+                        }
+                    ).then(() => {
+                        // alert("用户点击了确定按钮")
+                        // 发送异步请求,删除指定检查组的数据
+                        axios.get("/checkgroup/delById.do?id="+row.id).then((resp) => {
+                            if (resp.data.flag) {
+                                this.$message({
+                                    message: resp.data.message,
+                                    type: "success"
+                                });
+                            } else {
+                                // 删除失败
+                                this.$message.error(resp.data.message);
+                            }
+                        }).finally(()=>{
+                            this.findPage();
+                        })
+                    }).catch(() => {
+                        alert("用户点击了取消按钮")
+                    })
                 }
             }
         })

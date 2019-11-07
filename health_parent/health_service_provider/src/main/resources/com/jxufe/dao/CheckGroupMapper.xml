@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jxufe.dao.CheckGroupMapper">
+
+    <!--
+        resultType: 填写此javaBean属性的数据类型
+        keyProperty: 将最近插入的id封装到指定的javaBean属性中
+        order: 填写执行顺序after几乎为固定写法 代表先执行insert语句再获取插入id值
+    -->
+    <insert id="add">
+        <selectKey resultType="int" keyProperty="id" order="AFTER">
+            select LAST_INSERT_ID();
+        </selectKey>
+        insert into t_checkgroup values (null, #{code}, #{name}, #{helpCode}, #{sex}, #{remark}, #{attention})
+    </insert>
+
+    <!--
+        插入检查组与检查项之间的多对多的关联关系
+        param1: 检查组id
+        param2: 检查项id
+    -->
+    <insert id="setCheckGroupAndCheckItem">
+        insert into t_checkgroup_checkitem values (#{param1}, #{param2})
+    </insert>
+
+    <select id="findPage" resultType="checkgroup">
+        select * from t_checkgroup
+        <where>
+            <if test="value != null and value.length > 0">
+                code = #{value} or name = #{value} or helpCode = #{value}
+            </if>
+        </where>
+    </select>
+
+    <!--返回检查组回显的数据-->
+    <resultMap id="map1" type="CheckGroup">
+        <id column="id" property="id"></id>
+        <result column="code" property="code"></result>
+        <result column="name" property="name"></result>
+        <result column="helpCode" property="helpCode"></result>
+        <result column="sex" property="sex"></result>
+        <result column="remark" property="remark"></result>
+        <result column="attention" property="attention"></result>
+
+        <collection property="checkItems" ofType="CheckItem">
+            <id column="checkitem_id" property="id"></id>
+        </collection>
+    </resultMap>
+    
+    <select id="findById" resultMap="map1">
+        SELECT * FROM t_checkgroup a, t_checkgroup_checkitem b WHERE a.id = b.checkgroup_id AND a.id = #{id}
+    </select>
+
+    <!--修改检查项-->
+
+    <update id="updateById">
+        update t_checkgroup
+        <set>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="code != null">
+                name = #{name},
+            </if>
+            <if test="helpCode != null">
+                helpCode = #{helpCode},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+            <if test="attention != null">
+                attention = #{attention},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="delGroup">
+        delete from t_checkgroup where id = #{id}
+    </delete>
+
+    <!--根据检查组Id,删除中间表信息-->
+    <delete id="delCheckGroupItemByGId">
+        DELETE FROM t_checkgroup_checkitem WHERE checkgroup_id = #{id}
+    </delete>
+
+    <!--修改检查项的中间表-->
+    <update id="updateCheckGroupAndCheckItem">
+        update t_checkgroup_checkitem set checkitem_id = #{param2} where checkgroup_id = #{param1}
+    </update>
+
+
+
+</mapper>

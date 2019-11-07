@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/checkitem")
 public class CheckItemController {
@@ -72,5 +74,11 @@ public class CheckItemController {
         return new Result(true, MessageConstant.EDIT_CHECKITEM_SUCCESS);
     }
 
+    // 查找所有检查项
+    @RequestMapping("/findAll.do")
+    public List<CheckItem> findAll() {
+
+        return checkItemService.findAll();
+    }
 
 }

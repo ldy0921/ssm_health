@@ -330,9 +330,12 @@
                 },
                 // 删除
                 handleDelete(row) {
-                    this.$confirm("你确定要删除当前选中的记录吗?","提示",{type:'warning'}).then(()=>{
+                    this.$confirm(
+                        "你确定要删除当前选中的记录吗?",
+                        "提示",
+                        {type:'warning'}
+                        ).then(()=>{
                         alert(用户点击了确定按钮)
-
                     });
                 }
             }
