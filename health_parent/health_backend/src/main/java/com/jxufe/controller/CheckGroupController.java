@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * 检查组管理
  */
@@ -83,6 +85,19 @@ public class CheckGroupController {
         }
 
         return new Result(true, MessageConstant.DELETE_CHECKGROUP_SUCCESS);
+    }
+
+    @RequestMapping("/findAll.do")
+    public Result findAll(){
+
+        try {
+            List<CheckGroup> checkGroups = groupService.findAll();
+            return new Result(true, "查找检查组成功", checkGroups);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, "查找检查组失败");
+        }
+
     }
 
 }

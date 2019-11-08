@@ -93,4 +93,12 @@ public class CheckGroupServiceImpl implements CheckGroupService {
 
 
     }
+
+    // 查询所有
+    @Override
+    public List<CheckGroup> findAll() {
+
+        return groupMapper.findAll();
+
+    }
 }

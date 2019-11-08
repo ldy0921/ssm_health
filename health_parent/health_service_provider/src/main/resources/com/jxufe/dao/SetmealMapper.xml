@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jxufe.dao.SetmealMapper">
+
+
+    <insert id="add">
+
+        <selectKey resultType="int" keyProperty="id" order="AFTER">
+            select last_insert_id()
+        </selectKey>
+        insert into t_setmeal
+            values
+        (null,#{name},#{code},#{helpCode},#{sex},#{age},#{price},#{remark},#{attention},#{img})
+    </insert>
+
+
+    <insert id="setSetmealAndCheckGroup">
+        insert into t_setmeal_checkgroup values (#{param1}, #{param2})
+    </insert>
+
+</mapper>

@@ -94,5 +94,11 @@
     </update>
 
 
+    <!--查询所有-->
+    <select id="findAll" resultType="CheckGroup">
+        select * from t_checkgroup
+    </select>
+
+
 
 </mapper>
