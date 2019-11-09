@@ -19,4 +19,12 @@
         insert into t_setmeal_checkgroup values (#{param1}, #{param2})
     </insert>
 
+    <select id="findPage" resultType="Setmeal">
+        select * from t_setmeal
+        <where>
+            <if test="value != null and value.length > 0">
+                code = #{value} or name = #{value} or helpCode = #{value}
+            </if>
+        </where>
+    </select>
 </mapper>

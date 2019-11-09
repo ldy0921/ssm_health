@@ -5,6 +5,8 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.jxufe.constant.MessageConstant;
 import com.jxufe.constant.RedisConstant;
+import com.jxufe.entity.PageResult;
+import com.jxufe.entity.QueryPageBean;
 import com.jxufe.entity.Result;
 import com.jxufe.pojo.Setmeal;
 import com.jxufe.service.SetmealService;
@@ -19,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import redis.clients.jedis.JedisPool;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/setmeal")
@@ -62,12 +65,12 @@ public class SetmealController {
     @RequestMapping("/add.do")
     public Result add(@RequestBody Object[] obj) {
 
+        List<Integer> idsList = JSON.parseArray(obj[0].toString(), Integer.class);
+        Setmeal setmeal = JSON.parseObject(obj[1].toString(), Setmeal.class);
 
-        Integer[] ids = (Integer[]) obj[0];
-        Setmeal setmeal = (Setmeal) obj[1];
 
         try {
-            setmealService.add(ids, setmeal);
+            setmealService.add(idsList, setmeal);
             // 表单数据添加成功之后,把添加到数据库里的img名字保存到redis中
             jedisPool.getResource().sadd(RedisConstant.SETMEAL_PIC_DB_RESOURCES, setmeal.getImg());
         } catch (Exception e) {
@@ -76,6 +79,13 @@ public class SetmealController {
         }
 
         return new Result(true, MessageConstant.ADD_MEMBER_SUCCESS);
+
+    }
+
+    @RequestMapping("/findPage.do")
+    public PageResult findPage(@RequestBody QueryPageBean pageBean) {
+
+        return setmealService.findPage(pageBean);
 
     }
 

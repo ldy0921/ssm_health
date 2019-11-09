@@ -60,7 +60,7 @@
             <if test="code != null">
                 code = #{code},
             </if>
-            <if test="code != null">
+            <if test="name != null">
                 name = #{name},
             </if>
             <if test="helpCode != null">
